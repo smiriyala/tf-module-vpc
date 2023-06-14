@@ -141,3 +141,13 @@ resource "aws_eip" "nat" {
   # IN Part of STEP6.3, ELASTIC IP Address, lets create
   # ONCE NAT GATEWAY CREATED, route table  must be added to private route table
   # UPDATED IN STEP 3.2: for private route table wiht matching availability zone. 
+
+
+# STEP 7.1 - Adding Peering connection to VPC
+resource "aws_vpc_peering_connection" "foo" {
+  peer_owner_id = data.aws_caller_identity.account.id
+  peer_vpc_id   = var.default_vpc_id
+  vpc_id        = aws_vpc.main.id
+  # Auto accept can be given for my VPC account
+  auto_accept   = true
+}
