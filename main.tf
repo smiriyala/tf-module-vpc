@@ -54,6 +54,11 @@ resource "aws_route_table" "public-route-table" {
     gateway_id = aws_internet_gateway.internetGateWay.id
   }
 
+  #this route is adding inpart of STEP 7 - Peering VPC
+  route {
+    cidr_block = data.aws_vpc.default_vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
+  }
 
   for_each = var.public_subnets
   tags = merge(
@@ -74,6 +79,12 @@ resource "aws_route_table" "private-route-table" {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat-gateways["public-${split("-", each.value["name"])[1]}"].id
 
+  }
+
+  #this route is adding inpart of STEP 7 - Peering VPC
+  route {
+    cidr_block = data.aws_vpc.default_vpc.cidr_block
+    vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
   }
 
   tags = merge(
@@ -143,11 +154,25 @@ resource "aws_eip" "nat" {
   # UPDATED IN STEP 3.2: for private route table wiht matching availability zone. 
 
 
-# STEP 7.1 - Adding Peering connection to VPC
+# STEP 7.1 - Adding Peering connection to default VPC
 resource "aws_vpc_peering_connection" "foo" {
   peer_owner_id = data.aws_caller_identity.account.id
   peer_vpc_id   = var.default_vpc_id
   vpc_id        = aws_vpc.main.id
   # Auto accept can be given for my VPC account
   auto_accept   = true
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-peer" }
+  )
+}
+
+# STEP 8 - ADD Peering entry in private and public route tables. 
+  # Entries of route added in both private and public routes
+
+##Step 9 - route to default VPC for peering to work
+resource "aws_route" "route" {
+  route_table_id = var.default_route_table
+  destination_cidr_block = var.vpc_cidr
+  vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
