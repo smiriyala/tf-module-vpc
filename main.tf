@@ -47,6 +47,14 @@ resource "aws_subnet" "private_subnets" {
 ##Createing Public Routing tables 
 resource "aws_route_table" "public-route-table" {
   vpc_id   = aws_vpc.main.id
+
+  #this route is adding inpart of STEP5.1
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.internetGateWay.id
+  }
+
+
   for_each = var.public_subnets
   tags = merge(
     var.tags,
@@ -89,3 +97,15 @@ resource "aws_route_table_association" "private-association" {
   route_table_id = aws_route_table.private-route-table[each.value["name"]].id
   
 }
+
+
+#STEP 5.1: Add Internet GatewaY TO VPC and Public subnet route table
+# STEP 3.1 - second part on above added to "Public subnet route table"
+resource "aws_internet_gateway" "internetGateWay" {
+  vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    { Name = "${var.env}-igw" }
+  )
+}
+
