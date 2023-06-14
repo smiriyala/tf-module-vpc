@@ -72,7 +72,7 @@ resource "aws_route_table" "private-route-table" {
   #IN Part of STEP 5.3, NAT Gateway routing adding here. 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat-gateways["public-${split("_", each.value["name"])[1]}"].id
+    nat_gateway_id = aws_nat_gateway.nat-gateways["public_${split("_", each.value["name"])[1]}"].id
 
   }
 
