@@ -1,3 +1,4 @@
 output "public_subnets" {
-    value = aws_subnet.public_subnets[0].id
+    for_each = aws_subnet.public_subnets
+    value = aws_subnet.public_subnets[each.value["name"]].id
 }
