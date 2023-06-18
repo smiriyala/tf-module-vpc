@@ -156,7 +156,7 @@ resource "aws_eip" "nat" {
 
 # STEP 7.1 - Adding Peering connection to default VPC
 resource "aws_vpc_peering_connection" "peer" {
-  peer_owner_id = data.aws_caller_identity.account.id
+  peer_owner_id = data.aws_caller_identity.account.account_id
   peer_vpc_id   = var.default_vpc_id
   vpc_id        = aws_vpc.main.id
   # Auto accept can be given for my VPC account
