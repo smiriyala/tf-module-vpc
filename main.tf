@@ -142,7 +142,8 @@ resource "aws_nat_gateway" "nat-gateways" {
   )
 }
 
-# IN Part of STEP6.2, ELASTIC IP Address and 
+# IN Part of STEP6.2, ELASTIC IP Address required to connect internet through NAT gateway
+# Each public subnet must have separate ElasticIP for NAT gateway purpose. 
 resource "aws_eip" "nat" {
   for_each = var.public_subnets
   vpc = true
@@ -159,7 +160,9 @@ resource "aws_vpc_peering_connection" "peer" {
   peer_owner_id = data.aws_caller_identity.account.account_id
   peer_vpc_id   = var.default_vpc_id
   vpc_id        = aws_vpc.main.id
+  
   # Auto accept can be given for my VPC account
+  # auto accept cannt be done with someone own's vpc account 
   auto_accept   = true
   tags = merge(
     var.tags,
